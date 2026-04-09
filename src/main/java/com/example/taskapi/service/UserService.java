@@ -6,6 +6,7 @@ import com.example.taskapi.entity.User;
 import com.example.taskapi.exception.ResourceNotFoundException;
 import com.example.taskapi.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
@@ -13,17 +14,18 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
-
     public UserResponseDto createUser(UserRequestDto requestDto) {
 
         User user = new User();
         user.setName(requestDto.getName());
         user.setEmail(requestDto.getEmail());
         user.setRole(requestDto.getRole() != null ? requestDto.getRole() : "USER");
+        user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
 
         User savedUser = userRepository.save(user);
         return mapToResponseDto(savedUser);
@@ -50,7 +52,7 @@ public class UserService {
         existingUser.setName(requestDto.getName());
         existingUser.setEmail(requestDto.getEmail());
         existingUser.setRole(requestDto.getRole() != null ? requestDto.getRole() : existingUser.getRole());
-
+        existingUser.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         User savedUser = userRepository.save(existingUser);
         return mapToResponseDto(savedUser);
     }

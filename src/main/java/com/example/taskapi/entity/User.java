@@ -24,6 +24,9 @@ public class User {
     @Column(nullable = false, length = 20)
     private String role;
 
+    @Column(nullable = false, length = 255)
+    private String password;
+
     public User() {
     }
 
@@ -64,5 +67,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

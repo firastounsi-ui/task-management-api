@@ -12,6 +12,8 @@ public class UserRequestDto {
     @Email(message = "Email must be valid")
     private String email;
     private String role;
+    @NotBlank(message = "Password must not be blank")
+    private String password;
 
     public UserRequestDto() {
     }
@@ -43,5 +45,13 @@ public class UserRequestDto {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
