@@ -19,9 +19,11 @@ public class UserService {
     }
 
     public UserResponseDto createUser(UserRequestDto requestDto) {
+
         User user = new User();
         user.setName(requestDto.getName());
         user.setEmail(requestDto.getEmail());
+        user.setRole(requestDto.getRole() != null ? requestDto.getRole() : "USER");
 
         User savedUser = userRepository.save(user);
         return mapToResponseDto(savedUser);
@@ -47,6 +49,7 @@ public class UserService {
 
         existingUser.setName(requestDto.getName());
         existingUser.setEmail(requestDto.getEmail());
+        existingUser.setRole(requestDto.getRole() != null ? requestDto.getRole() : existingUser.getRole());
 
         User savedUser = userRepository.save(existingUser);
         return mapToResponseDto(savedUser);
@@ -63,7 +66,8 @@ public class UserService {
         return new UserResponseDto(
                 user.getId(),
                 user.getName(),
-                user.getEmail()
+                user.getEmail(),
+                user.getRole()
         );
     }
 }
