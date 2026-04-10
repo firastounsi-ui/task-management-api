@@ -3,14 +3,15 @@ package com.example.taskapi.service;
 import com.example.taskapi.dto.LoginRequestDto;
 import com.example.taskapi.dto.LoginResponseDto;
 import com.example.taskapi.dto.RegisterRequestDto;
+import com.example.taskapi.dto.UserResponseDto;
 import com.example.taskapi.entity.User;
 import com.example.taskapi.exception.DuplicateEmailException;
 import com.example.taskapi.repository.UserRepository;
 import com.example.taskapi.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
@@ -31,7 +32,6 @@ public class AuthService {
     }
 
     public LoginResponseDto login(LoginRequestDto request) {
-
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -50,8 +50,7 @@ public class AuthService {
         return new LoginResponseDto(token);
     }
 
-    public User register(RegisterRequestDto request) {
-
+    public UserResponseDto register(RegisterRequestDto request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new DuplicateEmailException("Email is already in use");
         }
@@ -62,6 +61,13 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole("USER");
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        return new UserResponseDto(
+                savedUser.getId(),
+                savedUser.getName(),
+                savedUser.getEmail(),
+                savedUser.getRole()
+        );
     }
 }

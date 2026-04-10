@@ -1,23 +1,30 @@
-    package com.example.taskapi.controller;
+package com.example.taskapi.controller;
 
-    import com.example.taskapi.dto.LoginRequestDto;
-    import com.example.taskapi.dto.LoginResponseDto;
-    import com.example.taskapi.service.AuthService;
-    import jakarta.validation.Valid;
-    import org.springframework.web.bind.annotation.*;
+import com.example.taskapi.dto.LoginRequestDto;
+import com.example.taskapi.dto.LoginResponseDto;
+import com.example.taskapi.dto.RegisterRequestDto;
+import com.example.taskapi.dto.UserResponseDto;
+import com.example.taskapi.service.AuthService;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
-    @RestController
-    @RequestMapping("/api/auth")
-    public class AuthController {
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
 
-        private final AuthService authService;
+    private final AuthService authService;
 
-        public AuthController(AuthService authService) {
-            this.authService = authService;
-        }
-
-        @PostMapping("/login")
-        public LoginResponseDto login(@Valid @RequestBody LoginRequestDto request) {
-            return authService.login(request);
-        }
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
+
+    @PostMapping("/login")
+    public LoginResponseDto login(@Valid @RequestBody LoginRequestDto request) {
+        return authService.login(request);
+    }
+
+    @PostMapping("/register")
+    public UserResponseDto register(@Valid @RequestBody RegisterRequestDto request) {
+        return authService.register(request);
+    }
+}
