@@ -25,4 +25,9 @@ public class GlobalExceptionHandler {
 
         return errors;
     }
+    @ExceptionHandler(DuplicateEmailException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleDuplicateEmail(DuplicateEmailException ex) {
+        return Map.of("error", ex.getMessage());
+    }
 }
