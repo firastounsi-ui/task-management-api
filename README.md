@@ -1,47 +1,102 @@
 # 🚀 Task Management API
+![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
 
-A RESTful backend API for managing users and tasks, built with **Java, Spring Boot, PostgreSQL, Flyway, and Docker**.
+A production-leaning backend API for managing users and tasks, built with Spring Boot and secured using JWT-based authentication and role-based authorization.
+
+This project demonstrates how to design and implement a secure, stateless REST API with clean architecture, proper validation, and testing practices.
 
 ---
 
 ## 🛠 Tech Stack
 
-- ☕ Java 17  
-- 🌱 Spring Boot  
-- 🗄 Spring Data JPA  
-- 🐘 PostgreSQL  
-- 🔄 Flyway (Database Migration)  
-- 🐳 Docker  
-- 📦 Gradle  
+- **Java 17**
+- **Spring Boot**
+- **Spring Security**
+- **PostgreSQL**
+- **Flyway (Database Migration)**
+- **Docker**
+- **JUnit & Mockito (Unit Testing)**
+- **MockMvc (Integration Testing)**
+- **Gradle**
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-- Full CRUD operations for Users and Tasks  
-- Clean layered architecture:
-  - Controller
-  - Service
-  - Repository  
-- DTO-based API design (separation of concerns)  
-- Input validation with meaningful error messages  
-- Global exception handling (`@RestControllerAdvice`)  
-- Database versioning with Flyway  
-- PostgreSQL running in Docker  
+- CRUD operations for tasks and basic user management
+- JWT-based authentication (stateless)
+- Role-based authorization (**USER / ADMIN**)
+- Secure password hashing with BCrypt
+- DTO-based API design (clear separation of concerns)
+- Global exception handling with structured JSON responses
+- Database versioning with Flyway
+- Dockerized PostgreSQL setup
 
 ---
 
-## 📁 Project Structure
+## 🔐 Security
 
-```text
-src/main/java/com/example/taskapi
-├── controller
-├── dto
-├── entity
-├── exception
-├── repository
-└── service
+The application uses **stateless JWT authentication**:
+
+- Users authenticate via `/api/auth/login`
+- A JWT token is issued and must be included in requests
+- Token contains user identity (**email**) and role
+- A custom `JwtAuthenticationFilter` validates tokens on each request
+
+### Authorization
+
+- Role-based access control enforced via Spring Security
+- Example:
+  - `DELETE /api/users/**` → **ADMIN only**
+  - Unauthorized access returns structured **403 responses**
+
+### Error Handling
+
+- Custom JSON responses for:
+  - `401 Unauthorized` (missing/invalid token)
+  - `403 Forbidden` (insufficient permissions)
+
+---
+
+## 🧪 Testing
+
+The project includes both **unit and integration tests**:
+
+### Unit Tests
+- Implemented with **JUnit + Mockito**
+- Focus on service layer business logic
+- Covers success and edge cases (e.g. duplicate users, missing data)
+
+### Integration Tests
+- Implemented with **MockMvc**
+- Tests full request flow:
+  - Register → Login → Authenticated requests
+  - Unauthorized access (401)
+  - Forbidden access (403)
+  - Role-based endpoint protection
+
+- Integration tests run against a local PostgreSQL instance with Flyway migrations
+
+👉 Tests verify not only functionality, but also security behavior.
+
+---
+
+## 🏗 Architecture
+
+The application follows a **layered architecture**:
+
 ```
+
+Controller → Service → Repository → Database
+
+````
+
+Key design choices:
+
+- **DTO pattern** to separate API and persistence layers
+- **Stateless authentication** for scalability
+- **Security isolation** (JWT service, filter, config separated)
+- **Flyway migrations** for controlled schema evolution
 
 ---
 
@@ -57,17 +112,15 @@ docker run -d \
   -e POSTGRES_USER=taskuser \
   -e POSTGRES_PASSWORD=taskpass \
   postgres:15-alpine
-```
+````
 
----
-
-### 2. Run the application
+### 2. Run the Application
 
 ```bash
 ./gradlew bootRun
 ```
 
-App will start at:
+App runs at:
 
 ```
 http://localhost:8080
@@ -75,92 +128,57 @@ http://localhost:8080
 
 ---
 
-## 🧪 API Endpoints
+## 📡 API Overview
 
-### 👤 Users
+### Authentication
 
-| Method | Endpoint | Description |
-|--------|---------|------------|
-| POST   | `/api/users` | Create user |
-| GET    | `/api/users` | Get all users |
-| GET    | `/api/users/{id}` | Get user by ID |
-| PUT    | `/api/users/{id}` | Update user |
-| DELETE | `/api/users/{id}` | Delete user |
+* `POST /api/auth/register`
+* `POST /api/auth/login`
 
----
+### Users
 
-### 📋 Tasks
+* `GET /api/users`
+* `GET /api/users/{id}`
+* `DELETE /api/users/{id}` (ADMIN only)
 
-| Method | Endpoint | Description |
-|--------|---------|------------|
-| POST   | `/api/tasks` | Create task |
-| GET    | `/api/tasks` | Get all tasks |
-| GET    | `/api/tasks/{id}` | Get task by ID |
-| PUT    | `/api/tasks/{id}` | Update task |
-| DELETE | `/api/tasks/{id}` | Delete task |
+### Tasks
+
+* `POST /api/tasks`
+* `GET /api/tasks`
+* `PUT /api/tasks/{id}`
+* `DELETE /api/tasks/{id}`
+
+### Authorization Header
 
 ---
 
-## 📌 Example Requests
+Authorization: Bearer <your-jwt-token>
+---
 
-### Create User
-
-```bash
-curl -X POST http://localhost:8080/api/users \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Sara","email":"sara@example.com"}'
-```
+All protected endpoints require a valid JWT token.
 
 ---
 
-### Create Task
+## 🧠 Engineering Highlights
 
-```bash
-curl -X POST http://localhost:8080/api/tasks \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title":"Backend Projekt final",
-    "description":"DTOs und Update eingebaut",
-    "status":"IN_PROGRESS",
-    "userId":1
-  }'
-```
-
----
-
-## ❗ Error Handling
-
-- `404 Not Found` → Resource does not exist  
-- `400 Bad Request` → Validation errors  
-
-Example:
-
-```json
-{
-  "title": "Title must not be blank",
-  "userId": "User id must not be null"
-}
-```
-
----
-
-## 📚 What I Learned
-
-- Designing REST APIs with Spring Boot  
-- Structuring applications using layered architecture  
-- Using PostgreSQL with Docker for reproducible environments  
-- Managing database schema with Flyway migrations  
-- Separating API and persistence layers using DTOs  
-- Implementing validation and global exception handling  
+* Designed a **stateless authentication system** using JWT
+* Implemented **role-based access control** with Spring Security
+* Structured application with **clear separation of concerns**
+* Ensured reliability through **unit + integration testing**
+* Used **Flyway** for safe and reproducible database migrations
+* Built with a focus on **real-world backend practices**, not just functionality
 
 ---
 
 ## 🎯 Summary
 
-This project demonstrates how to build a clean, maintainable backend API using Spring Boot with proper architecture, validation, and database management.
+This project demonstrates how to build a secure, testable, and maintainable backend system using Spring Boot, following modern backend engineering practices.
 
 ---
 
 ## 👨‍💻 Author
 
-- GitHub: https://github.com/firastounsi-ui
+* GitHub: [https://github.com/firastounsi-ui](https://github.com/firastounsi-ui)  
+
+so this it i did ? 
+do i need to add a test badge or so as u said ? 
