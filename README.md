@@ -180,5 +180,3 @@ This project demonstrates how to build a secure, testable, and maintainable back
 
 * GitHub: [https://github.com/firastounsi-ui](https://github.com/firastounsi-ui)  
 
-so this it i did ? 
-do i need to add a test badge or so as u said ? 
